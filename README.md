@@ -1,1 +1,1 @@
-# Pathfinding-Algorithm
+# Pathfinding Algorithm
