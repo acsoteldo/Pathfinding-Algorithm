@@ -4,3 +4,6 @@
 * Working on programming maze generation algorithms and visual animation of the algorithms to incorporate HTML and CSS and built on UX/UI design.
 
 Visualise maze creation & pathfinding algorithms with pygame
+
+## Screenshots
+[update]
