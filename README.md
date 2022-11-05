@@ -1,9 +1,28 @@
 # Pathfinding Algorithm
 
-* Implemented 3 different algorithms with breadth-first search, depth-first search and A* search in Python to find the shortest path between two points, source and destination, represented in a graph with the nodes and weight of edges provided.
-* Working on programming maze generation algorithms and visual animation of the algorithms to incorporate HTML and CSS and built on UX/UI design.
+This program calculates the shortest path between two points(source and destination) in Python with 3 different algorithms: breadth-first search, depth-first search and A* search. Currently the program is represented in a graph with the nodes and weight of edges provided on a randomly generated maze visualized with pygame. Various heuristics are used, and if the path is found between the points, it's highlighted in green.
 
-Visualise maze creation & pathfinding algorithms with pygame
+[] Add more maze generation algorithms 
+[] Incorporate HTML and CSS
 
-## Screenshots
+__Tips:__
+* To clear all paths, press ’C’.
+* To generate a new random maze, press ’R’
+
+### Technology used
+Python for backend
+libraries/modules:
+* pygame
+
+## Breadth-first search
+### Screenshots
+[update]
+
+## Depth-first search 
+### Screenshots
+[update]
+
+## A* search
+A* is a search algorithm that is used to find the optimal path between two locations. It runs faster than Dijkstra's algorithm, and takes into account two properties to determine the search priority of the nodes.
+### Screenshots
 [update]
