@@ -2,9 +2,16 @@
 
 This program calculates the shortest path between two points(source and destination) in Python with 3 different algorithms: breadth-first search, depth-first search and A* search. Currently the program is represented in a graph with the nodes and weight of edges provided on a randomly generated maze visualized with pygame. Various heuristics are used, and if the path is found between the points, it's highlighted in green.
 
+* The create_random_graph function generates a grid of Vertex objects with a random number of barriers (colored black).
+* The clear_paths function resets the colors of the Vertex objects to white (empty).
+* The Vertex class represents a single node in the grid, and has several methods for updating and drawing the node, as well as checking its type and neighbors.
+* The draw function is used to draw the grid and nodes on the Pygame window.
+* The draw_grid function is used to draw the lines between the nodes on the Pygame window.
+* The get_clicked_pos function gets the position of the mouse click and returns the row and column of the clicked node.
+* The main function contains the main loop of the program, which handles user input, updates the graph, and redraws the window.
+
 #### Tips:
-* To clear all paths, press ’C’.
-* To generate a new random maze, press ’R’
+* To generate a new random maze, press ’c’
 
 #### Technology used
 * Python for backend
