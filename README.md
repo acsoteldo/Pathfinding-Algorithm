@@ -25,5 +25,6 @@ This program calculates the shortest path between two points(source and destinat
 
 ## A* search
 A* is a search algorithm that is used to find the optimal path between two locations. It runs faster than Dijkstra's algorithm, and takes into account two properties to determine the search priority of the nodes.
+The heuristic function is used to estimate the cost of reaching the goal from a given node. In the A* search algorithm, an estimate of the cost is used from the current node to the goal to guide the search and reduce the search space.
 ### Screenshots
 [update]
