@@ -12,6 +12,9 @@ This program calculates the shortest path between two points(source and destinat
 
 #### Tips:
 * To generate a new random maze, press ’c’
+* For A* search, press ’a’
+* For Breadth-first search, press ’b’
+* For Depth-first search, press ’d’
 
 #### Technology used
 * Python for backend
