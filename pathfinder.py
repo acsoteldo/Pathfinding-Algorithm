@@ -184,6 +184,7 @@ def a_star(draw, graph, start, goal):
 def breadth_first_search(draw, graph, start, goal):
     queue = []
     path=[]
+    came_from = {}
     queue.append(start)
 
     while len(queue) > 0:
@@ -193,11 +194,12 @@ def breadth_first_search(draw, graph, start, goal):
             if neighbor.is_closed():
                 continue
             elif neighbor == goal:
+                reconstruct_path(came_from, goal, draw)
                 goal.make_goal()
                 path.append(current_node)
                 neighbor.make_path()
                 path.append(neighbor)
-                return path[::-1]
+                return True
             else:
                 if not neighbor.is_open():
                     neighbor.make_open()
@@ -214,6 +216,7 @@ def breadth_first_search(draw, graph, start, goal):
 def depth_first_search(draw, graph, start, goal):
     stack = []
     path = []
+    came_from = {}
     stack.append(start)
 
     while len(stack) > 0:
@@ -223,11 +226,12 @@ def depth_first_search(draw, graph, start, goal):
             if neighbor.is_closed():
                 continue
             elif neighbor == goal:
+                reconstruct_path(came_from, goal, draw)
                 goal.make_goal()
                 path.append(current_node)
                 neighbor.make_path()
                 path.append(neighbor)
-                return path[::-1]
+                return True
             else:
                 if not neighbor.is_open():
                     neighbor.make_open()
