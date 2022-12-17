@@ -24,15 +24,15 @@ This program calculates the shortest path between two points(source and destinat
 
 ## Breadth-first search
 BFS is an algorithm for traversing a graph in which nodes are visited in the order of their distance from the start node. It works by maintaining a queue of nodes to visit, starting with the start node, and adding the neighbors of each visited node to the end of the queue. BFS returns the shortest path between the start and goal nodes, since it always expands the node that is closest to the start first.
-### Screenshots
-[update]
+### Demo
+https://user-images.githubusercontent.com/76544489/208216112-a232c1ee-3e1a-4454-be3d-fe5e3481bf36.mov
 
 ## Depth-first search 
 DFS is an algorithm for traversing a graph in which nodes are visited in a depth-first manner, meaning that a node is fully explored before its neighbors are explored. It works by maintaining a stack of nodes to visit, starting with the start node, and adding the neighbors of each visited node to the top of the stack. DFS does not necessarily find the shortest path between the start and goal nodes, as it does not prioritize expanding nodes that are closer to the start.
-### Screenshots
-[update]
+### Demo
+https://user-images.githubusercontent.com/76544489/208216095-6f509e03-51d9-4843-b4f7-7ea8720bfe39.mov
 
 ## A* search
 A* search is an algorithm for finding the shortest path between two nodes in a graph. It combines the strengths of BFS and DFS by using a heuristic function to guide the search towards the goal. The heuristic function estimates the distance from a given node to the goal, and A* expands the node that has the lowest estimated total cost (the sum of the cost of reaching the node and the estimated distance to the goal). A* is guaranteed to find the shortest path if the heuristic function is admissible, meaning that it never overestimates the distance to the goal.
-### Screenshots
-[update]
+### Demo
+https://user-images.githubusercontent.com/76544489/208216108-3464dfcd-e67b-41eb-adc5-3afe54c2dc70.mov
