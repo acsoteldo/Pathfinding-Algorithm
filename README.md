@@ -1,6 +1,6 @@
 # Pathfinding Algorithm
 
-This program calculates the shortest path between two points(source and destination) in Python with 3 different algorithms: breadth-first search, depth-first search and A* search. Currently the program is represented in a graph with the nodes and weight of edges provided on a randomly generated maze visualized with pygame. Various heuristics are used, and if the path is found between the points, it's highlighted in green.
+This program calculates the shortest path between two points(source and destination) in Python with 3 different algorithms: breadth-first search, depth-first search and A* search. Currently the program is represented in a graph with the nodes and weight of edges provided on a randomly generated maze visualized with pygame. Various heuristics are used, and if the path is found between the points, it's highlighted in blue.
 
 * The create_random_graph function generates a grid of Vertex objects with a random number of barriers (colored black).
 * The clear_paths function resets the colors of the Vertex objects to white (empty).
