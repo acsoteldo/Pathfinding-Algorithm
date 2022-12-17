@@ -5,7 +5,6 @@ from random import randint, choice
 from typing import List
 from pygame.colordict import THECOLORS
 from collections import deque
-from main import Vertex, pathfinder
 
 SIZE = 600 
 WINDOW = pygame.display.set_mode((SIZE, SIZE)) # Window size
@@ -20,30 +19,6 @@ ORANGE = (255, 165, 0) #Start
 PURPLE = (128, 0, 128) #goal
 TURQUOISE = (64, 224, 208) #Path
 LIGHT_GREY = (128, 128, 128) #Buttons
-
-def create_random_graph(num_rows: int, graph_width: int) -> List[List[Vertex]]:
-    graph = []
-    node_width = graph_width // num_rows
-
-    for row in range(num_rows):
-        graph.append([])
-        for column in range(num_rows):
-            node = Vertex(row, column, node_width, num_rows)
-            if choice([True, False]):
-                node.color = THECOLORS['black']
-            graph[row].append(node)
-
-    return graph
-
-def clear_paths(graph: List[List[Vertex]]) -> None: # New maze
-    for row in range(len(graph)):
-        for column in range(len(graph)):
-            if graph[row][column].color == THECOLORS['red'] or \
-                    graph[row][column].color == THECOLORS['yellow'] or \
-                    graph[row][column].color == THECOLORS['green']:
-                graph[row][column].color = THECOLORS['white']
-
-    return graph
 
 class Vertex:
     def __init__(self, row, col, size, total_rows):
@@ -123,6 +98,30 @@ class Vertex:
         #LEFT
         if self.col > 0 and not graph[self.row][self.col - 1].is_barrier():
             self.neighbors.append(graph[self.row][self.col - 1])
+
+def create_random_graph(num_rows: int, graph_width: int) -> List[List[Vertex]]:
+    graph = []
+    node_width = graph_width // num_rows
+
+    for row in range(num_rows):
+        graph.append([])
+        for column in range(num_rows):
+            node = Vertex(row, column, node_width, num_rows)
+            if choice([True, False]):
+                node.color = THECOLORS['black']
+            graph[row].append(node)
+
+    return graph
+
+def clear_paths(graph: List[List[Vertex]]) -> None: # New maze
+    for row in range(len(graph)):
+        for column in range(len(graph)):
+            if graph[row][column].color == THECOLORS['red'] or \
+                    graph[row][column].color == THECOLORS['yellow'] or \
+                    graph[row][column].color == THECOLORS['green']:
+                graph[row][column].color = THECOLORS['white']
+
+    return graph
 
 # For A* search
 def heuristic(node1, node2):
