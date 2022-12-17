@@ -181,36 +181,6 @@ def a_star(draw, graph, start, goal):
 
     return None
 
-def depth_first_search(draw, graph, start, goal):
-    stack = []
-    path = []
-    stack.append(start)
-
-    while len(stack) > 0:
-        current_node = stack.pop()
-
-        for neighbor in current_node.neighbors:
-            if neighbor.is_closed():
-                continue
-            elif neighbor == goal:
-                goal.make_goal()
-                path.append(current_node)
-                neighbor.make_path()
-                path.append(neighbor)
-                return path[::-1]
-            else:
-                if not neighbor.is_open():
-                    neighbor.make_open()
-                stack.append(neighbor)
-                path.append(current_node)
-        
-        draw()
-        
-        if current_node != start:
-            current_node.make_closed()
-   
-    return None
-
 def breadth_first_search(draw, graph, start, goal):
     queue = []
     path=[]
@@ -239,6 +209,36 @@ def breadth_first_search(draw, graph, start, goal):
         if current_node != start:
             current_node.make_closed()
 
+    return None
+
+def depth_first_search(draw, graph, start, goal):
+    stack = []
+    path = []
+    stack.append(start)
+
+    while len(stack) > 0:
+        current_node = stack.pop()
+
+        for neighbor in current_node.neighbors:
+            if neighbor.is_closed():
+                continue
+            elif neighbor == goal:
+                goal.make_goal()
+                path.append(current_node)
+                neighbor.make_path()
+                path.append(neighbor)
+                return path[::-1]
+            else:
+                if not neighbor.is_open():
+                    neighbor.make_open()
+                stack.append(neighbor)
+                path.append(current_node)
+        
+        draw()
+        
+        if current_node != start:
+            current_node.make_closed()
+   
     return None
 
 def draw_grid(win, rows, size):
@@ -315,18 +315,18 @@ def main(win, width):
                         for node in row:
                             node.update_neighbors(grid)
                     a_star(lambda: draw(win, grid, ROWS, width), grid, start, goal)
-                #KEY_D starts the DFS pathfinder
-                if event.key == pygame.K_d and start and goal:
-                    for row in grid:
-                        for node in row:
-                            node.update_neighbors(grid)
-                    depth_first_search(lambda: draw(win, grid, ROWS, width), grid, start, goal)
                 #KEY_B starts the BFS pathfinder
                 if event.key == pygame.K_b and start and goal:
                     for row in grid:
                         for node in row:
                             node.update_neighbors(grid)
                     breadth_first_search(lambda: draw(win, grid, ROWS, width), grid, start, goal)
+                #KEY_D starts the DFS pathfinder
+                if event.key == pygame.K_d and start and goal:
+                    for row in grid:
+                        for node in row:
+                            node.update_neighbors(grid)
+                    depth_first_search(lambda: draw(win, grid, ROWS, width), grid, start, goal)
                 # New maze
                 if event.key == pygame.K_SPACE:
                     start = None
