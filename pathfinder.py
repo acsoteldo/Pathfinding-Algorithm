@@ -270,7 +270,7 @@ def get_clicked_pos(pos, rows, size):
 def main(win, width):
     ROWS = 50
     clock = pygame.time.Clock()
-    grid = create_random_graph(ROWS, width)
+    graph = create_random_graph(ROWS, width)
 
     start = None
     goal = None
@@ -278,7 +278,7 @@ def main(win, width):
     running = True
     while running:
         clock.tick(25)
-        draw(win, grid, ROWS, width)
+        draw(win, graph, ROWS, width)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -286,7 +286,7 @@ def main(win, width):
             if pygame.mouse.get_pressed()[0]: # LEFT
                 pos = pygame.mouse.get_pos()
                 row, col = get_clicked_pos(pos, ROWS, width)
-                node = grid[row][col]
+                node = graph[row][col]
                 if not start and node != goal:
                     start = node
                     start.make_start()
@@ -301,7 +301,7 @@ def main(win, width):
             elif pygame.mouse.get_pressed()[2]: # RIGHT
                 pos = pygame.mouse.get_pos()
                 row, col = get_clicked_pos(pos, ROWS, width)
-                node = grid[row][col]
+                node = graph[row][col]
                 node.reset()
                 if node == start:
                     start = None
@@ -311,27 +311,27 @@ def main(win, width):
             if event.type == pygame.KEYDOWN:
                 #KEY_A starts the A* pathfinder
                 if event.key == pygame.K_a and start and goal:
-                    for row in grid:
+                    for row in graph:
                         for node in row:
-                            node.update_neighbors(grid)
-                    a_star(lambda: draw(win, grid, ROWS, width), grid, start, goal)
+                            node.update_neighbors(graph)
+                    a_star(lambda: draw(win, graph, ROWS, width), graph, start, goal)
                 #KEY_B starts the BFS pathfinder
                 if event.key == pygame.K_b and start and goal:
-                    for row in grid:
+                    for row in graph:
                         for node in row:
-                            node.update_neighbors(grid)
-                    breadth_first_search(lambda: draw(win, grid, ROWS, width), grid, start, goal)
+                            node.update_neighbors(graph)
+                    breadth_first_search(lambda: draw(win, graph, ROWS, width), graph, start, goal)
                 #KEY_D starts the DFS pathfinder
                 if event.key == pygame.K_d and start and goal:
-                    for row in grid:
+                    for row in graph:
                         for node in row:
-                            node.update_neighbors(grid)
-                    depth_first_search(lambda: draw(win, grid, ROWS, width), grid, start, goal)
+                            node.update_neighbors(graph)
+                    depth_first_search(lambda: draw(win, graph, ROWS, width), graph, start, goal)
                 # New maze
                 if event.key == pygame.K_SPACE:
                     start = None
                     goal = None
-                    grid = create_random_graph(ROWS, width)
+                    graph = create_random_graph(ROWS, width)
 
     pygame.quit()
 
