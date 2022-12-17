@@ -1,6 +1,5 @@
 import pygame
-from math import inf
-import time
+import math
 from queue import PriorityQueue
 from random import randint, choice
 from typing import List
@@ -10,43 +9,43 @@ from main import Vertex, pathfinder
 
 SIZE = 600 
 WINDOW = pygame.display.set_mode((SIZE, SIZE)) # Window size
-pygame.display.set_caption("Pathfinding pathfinder") # Window title
+pygame.display.set_caption("Pathfinding Algorithm") # Window title
 
 BLACK = (0, 0, 10) #Barrier
 WHITE = (248, 248, 255) #Empty
-GRAY = (128, 128, 128) #Grid Lines
+GRAY = (128, 128, 128) #graph Lines
 RED = (220, 20, 60) #Closed
 GREEN = (50, 205, 50) #Open
 ORANGE = (255, 165, 0) #Start
-PURPLE = (128, 0, 128) #End
+PURPLE = (128, 0, 128) #goal
 TURQUOISE = (64, 224, 208) #Path
 LIGHT_GREY = (128, 128, 128) #Buttons
 
-def create_random_grid(num_rows: int, grid_width: int) -> List[List[Vertex]]:
-    grid = []
-    node_width = grid_width // num_rows
+def create_random_graph(num_rows: int, graph_width: int) -> List[List[Vertex]]:
+    graph = []
+    node_width = graph_width // num_rows
 
     for row in range(num_rows):
-        grid.append([])
+        graph.append([])
         for column in range(num_rows):
             node = Vertex(row, column, node_width, num_rows)
             if choice([True, False]):
                 node.color = THECOLORS['black']
-            grid[row].append(node)
+            graph[row].append(node)
 
-    return grid
+    return graph
 
-def clear_paths(grid: List[List[Vertex]]) -> None: # New maze
-    for row in range(len(grid)):
-        for column in range(len(grid)):
-            if grid[row][column].color == THECOLORS['red'] or \
-                    grid[row][column].color == THECOLORS['yellow'] or \
-                    grid[row][column].color == THECOLORS['green']:
-                grid[row][column].color = THECOLORS['white']
+def clear_paths(graph: List[List[Vertex]]) -> None: # New maze
+    for row in range(len(graph)):
+        for column in range(len(graph)):
+            if graph[row][column].color == THECOLORS['red'] or \
+                    graph[row][column].color == THECOLORS['yellow'] or \
+                    graph[row][column].color == THECOLORS['green']:
+                graph[row][column].color = THECOLORS['white']
 
-    return grid
+    return graph
 
-class Node:
+class Vertex:
     def __init__(self, row, col, size, total_rows):
         self.row = row
         self.col = col
@@ -74,23 +73,24 @@ class Node:
     def is_start(self):
         return self.color == ORANGE
 
-    def is_end(self):
+    def is_goal(self):
         return self.color == PURPLE
-
+        
     #Methods that set/make nodes 
     def make_closed(self):
         self.color = RED
     
     def make_open(self):
         self.color = GREEN
-    
+        return
+
     def make_barrier(self):
         self.color = BLACK
     
     def make_start(self):
         self.color = ORANGE
 
-    def make_end(self):
+    def make_goal(self):
         self.color = PURPLE
     
     def make_path(self):
@@ -101,85 +101,73 @@ class Node:
         self.color = WHITE
 
     #Draws node
-    def draw(self, win):
-        pygame.draw.rect(win, self.color, (self.x, self.y, self.size, self.size))
+    def draw(self, win, size):
+        pygame.draw.rect(win, self.color, (self.x, self.y, size, size))
 
     #Checks and updates neighboring nodes
-    def update_neighbors(self, grid):
+    def update_neighbors(self, graph):
         self.neighbors = []
 
         #DOWN
-        if self.row < self.total_rows - 1 and not grid[self.row + 1][self.col].is_barrier():
-            self.neighbors.append(grid[self.row + 1][self.col])
+        if self.row < self.total_rows - 1 and not graph[self.row + 1][self.col].is_barrier():
+            self.neighbors.append(graph[self.row + 1][self.col])
 
         #UP
-        if self.row > 0 and not grid[self.row - 1][self.col].is_barrier():
-            self.neighbors.append(grid[self.row - 1][self.col])
-        
+        if self.row > 0 and not graph[self.row - 1][self.col].is_barrier():
+            self.neighbors.append(graph[self.row - 1][self.col])
+
         #RIGHT
-        if self.col < self.total_rows - 1 and not grid[self.row][self.col + 1].is_barrier():
-            self.neighbors.append(grid[self.row][self.col + 1])
+        if self.col < self.total_rows - 1 and not graph[self.row][self.col + 1].is_barrier():
+            self.neighbors.append(graph[self.row][self.col + 1])
 
         #LEFT
-        if self.row > 0 and not grid[self.row][self.col - 1].is_barrier():
-            self.neighbors.append(grid[self.row][self.col - 1])
+        if self.col > 0 and not graph[self.row][self.col - 1].is_barrier():
+            self.neighbors.append(graph[self.row][self.col - 1])
 
-    def __lt__(self, other):
-        return False
+# For A* search
+def heuristic(node1, node2):
+    x1, y1 = node1
+    x2, y2 = node2
+    return math.sqrt((x1 - x2)**2 + (y1 - y2)**2)
 
-# Defining our heuristic to calculate the distance between two points (p1 and p2)
-def h(p1, p2):
-    x1, y1 = p1
-    x2, y2 = p2
-    return abs(x1 - x2) + abs(y1 - y2)
-
-# Reconstructs shortest path between start and end to draw
-def reconstruct_path(came_from, current, draw):
-    while current in came_from:
-        current = came_from[current]
-        current.make_path()
+def reconstruct_path(came_from, current_node, draw):
+    while current_node in came_from:
+        current_node = came_from[current_node]
+        current_node.make_path()
         draw()
 
-# Used to manage how fast the screen updates
-clock = pygame.time.Clock()
-
-'''
-# pathfinder Logic
-def pathfinder(draw, grid, start, end):
+def a_star(draw, graph, start, goal):
     count = 0
     open_set = PriorityQueue()
     open_set.put((0, count, start))
     came_from = {}
-
-    g_score = {node: float("inf") for row in grid for node in row}
+    g_score = {node: float("inf") for row in graph for node in row}
     g_score[start] = 0
-    f_score = {node: float("inf") for row in grid for node in row}
-    f_score[start] = h(start.get_pos(), end.get_pos())
+    f_score = {node: float("inf") for row in graph for node in row}
+    f_score[start] = heuristic(start.get_pos(), goal.get_pos())
 
     open_set_hash = {start}
 
     while not open_set.empty():
-        #Allows user to quit program while pathfinder is running
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-        
-        current = open_set.get()[2]
-        open_set_hash.remove(current)
 
-        #Makes path if current node is the end node
-        if current == end:
-            reconstruct_path(came_from, end, draw)
-            end.make_end()
+        current_node = open_set.get()[2]
+        open_set_hash.remove(current_node)
+
+        if current_node == goal:
+            reconstruct_path(came_from, goal, draw)
+            goal.make_goal()
             return True
 
-        for neighbor in current.neighbors:
-            temp_g_score = g_score[current] + 1
+        for neighbor in current_node.neighbors:
+            temp_g_score = g_score[current_node] + 1
 
             if temp_g_score < g_score[neighbor]:
-                came_from[neighbor] = current
+                came_from[neighbor] = current_node
                 g_score[neighbor] = temp_g_score
-                f_score[neighbor] = temp_g_score + h(neighbor.get_pos(), end.get_pos())
+                f_score[neighbor] = temp_g_score + heuristic(neighbor.get_pos(), goal.get_pos())
                 if neighbor not in open_set_hash:
                     count += 1
                     open_set.put((f_score[neighbor], count, neighbor))
@@ -188,41 +176,85 @@ def pathfinder(draw, grid, start, end):
 
         draw()
 
-        if current != start:
-            current.make_closed()
+        if current_node != start:
+            current_node.make_closed()
 
-    return False    '''   
+    return None
 
+def depth_first_search(draw, graph, start, goal):
+    stack = []
+    path = []
+    stack.append(start)
 
-#Makes grid of nodes
-def make_grid(rows, size):
-    grid = []
-    gap = size // rows
-    for i in range(rows):
-        grid.append([])
-        for j in range(rows):
-            node = Node(i , j, gap, rows)
-            grid[i].append(node)
+    while len(stack) > 0:
+        current_node = stack.pop()
 
-    return grid
+        for neighbor in current_node.neighbors:
+            if neighbor.is_closed():
+                continue
+            elif neighbor == goal:
+                goal.make_goal()
+                path.append(current_node)
+                neighbor.make_path()
+                path.append(neighbor)
+                return path[::-1]
+            else:
+                if not neighbor.is_open():
+                    neighbor.make_open()
+                stack.append(neighbor)
+                path.append(current_node)
+        
+        draw()
+        
+        if current_node != start:
+            current_node.make_closed()
+   
+    return None
 
-#Draws the grid lines onto the Window
+def breadth_first_search(draw, graph, start, goal):
+    queue = []
+    path=[]
+    queue.append(start)
+
+    while len(queue) > 0:
+        current_node = queue.pop(0)
+
+        for neighbor in current_node.neighbors:
+            if neighbor.is_closed():
+                continue
+            elif neighbor == goal:
+                goal.make_goal()
+                path.append(current_node)
+                neighbor.make_path()
+                path.append(neighbor)
+                return path[::-1]
+            else:
+                if not neighbor.is_open():
+                    neighbor.make_open()
+                queue.append(neighbor)
+                path.append(current_node)
+        
+        draw()
+
+        if current_node != start:
+            current_node.make_closed()
+
+    return None
+
 def draw_grid(win, rows, size):
     gap = size // rows
-    #For loop draws vertical lines
     for i in range(rows):
         pygame.draw.line(win, GRAY, (0, i * gap), (size, i * gap))
-        #Draws horizontal lines
         for j in range(rows):
             pygame.draw.line(win, GRAY, (j * gap, 0), (j * gap, size))
 
-def draw(win, grid, rows, size):
+def draw(win, graph, rows, size):
     win.fill(WHITE)
 
-    for row in grid:
+    for row in graph:
         for node in row:
-            node.draw(win)
-    
+            node.draw(win, size)
+
     draw_grid(win, rows, size)
     pygame.display.update()
 
@@ -232,107 +264,75 @@ def get_clicked_pos(pos, rows, size):
 
     row = y // gap
     col = x // gap
+
     return row, col
 
-# Set start and end points for the pathfinder
-DIAGONALS = False
-VISUALISE = True
-
-#MAIN LOOP
-def main(win, size):
+def main(win, width):
     ROWS = 50
-    grid = make_grid(ROWS, size)
+    clock = pygame.time.Clock()
+    grid = create_random_graph(ROWS, width)
 
-    #Start/End nodes
-    start_position = None
-    end_position = None
+    start = None
+    goal = None
 
-    run = True
-
-    #Algo loop
-    while run:
-        draw(win, grid, ROWS, size)
-        #Checks for different types of events that may happen
+    running = True
+    while running:
+        clock.tick(25)
+        draw(win, grid, ROWS, width)
         for event in pygame.event.get():
-            #Quit Event
             if event.type == pygame.QUIT:
-                run = False
+                running = False
 
-            #Left Mouse Click
-            if pygame.mouse.get_pressed()[0]:
+            if pygame.mouse.get_pressed()[0]: # LEFT
                 pos = pygame.mouse.get_pos()
-                row, col = get_clicked_pos(pos, ROWS, size)
+                row, col = get_clicked_pos(pos, ROWS, width)
                 node = grid[row][col]
+                if not start and node != goal:
+                    start = node
+                    start.make_start()
 
-                #If Start node does not exist, make it
-                if not start_position and node != end_position:
-                    start_position = node
-                    start_position.make_start()
+                elif not goal and node != start:
+                    goal = node
+                    goal.make_goal()
 
-                #If End node does not exist, make it
-                elif not end_position and node != start_position:
-                    end_position = node
-                    end_position.make_end()
-
-                #make barrier nodes
-                elif node != end_position and node != start_position:
+                elif node != goal and node != start:
                     node.make_barrier()
 
-            #Right Mouse Click/Erase
-            elif pygame.mouse.get_pressed()[2]:
+            elif pygame.mouse.get_pressed()[2]: # RIGHT
                 pos = pygame.mouse.get_pos()
-                row, col = get_clicked_pos(pos, ROWS, size)
+                row, col = get_clicked_pos(pos, ROWS, width)
                 node = grid[row][col]
                 node.reset()
-
-                if node == start_position:
-                    start_position = None
-                elif node == end_position:
-                    end_position = None
+                if node == start:
+                    start = None
+                elif node == goal:
+                    goal = None
 
             if event.type == pygame.KEYDOWN:
                 #KEY_A starts the A* pathfinder
-                if event.key == pygame.K_a and start_position and end_position:
+                if event.key == pygame.K_a and start and goal:
                     for row in grid:
                         for node in row:
                             node.update_neighbors(grid)
-
-                    pathfinder(lambda: draw(win, grid, ROWS, size), grid, start_position, end_position, 'manhattan')
-            
+                    a_star(lambda: draw(win, grid, ROWS, width), grid, start, goal)
                 #KEY_D starts the DFS pathfinder
-                elif event.key == pygame.K_d and start_position and end_position:
+                if event.key == pygame.K_d and start and goal:
                     for row in grid:
                         for node in row:
                             node.update_neighbors(grid)
-
-                    pathfinder(lambda: draw(win, grid, ROWS, size), grid, start_position, end_position, 'pythagorean')
-
-                #KEY_W starts the BFS pathfinder
-                elif event.key == pygame.K_w and start_position and end_position:
+                    depth_first_search(lambda: draw(win, grid, ROWS, width), grid, start, goal)
+                #KEY_B starts the BFS pathfinder
+                if event.key == pygame.K_b and start and goal:
                     for row in grid:
                         for node in row:
                             node.update_neighbors(grid)
-  
-                    pathfinder(lambda: draw(win, grid, ROWS, size), grid, start_position, end_position, 'diagonal')
-          
-                 
-                # Clear path
-                elif event.key == pygame.K_c:
-                    clear_paths(grid) 
-                
+                    breadth_first_search(lambda: draw(win, grid, ROWS, width), grid, start, goal)
                 # New maze
-                elif event.key == pygame.K_r:
-                    grid = create_random_grid(ROWS, size)
-                    start_position = grid[randint(0, ROWS - 1)][randint(0, ROWS - 1)]
-                    end_position = grid[randint(0, ROWS - 1)][randint(0, ROWS - 1)]
-                    start_position.color = THECOLORS['blue']
-                    end_position.color = THECOLORS['purple']
-                
-            
+                if event.key == pygame.K_SPACE:
+                    start = None
+                    goal = None
+                    grid = create_random_graph(ROWS, width)
 
-    # Limit to 60 frames per second
-    clock.tick(60)
-  
-    # Close the window and quit.
     pygame.quit()
+
 main(WINDOW, SIZE)
